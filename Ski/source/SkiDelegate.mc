@@ -17,6 +17,16 @@ class SkiDelegate extends WatchUi.BehaviorDelegate {
         return true;
     }
 
+    function onNextPage() {
+        _view.next();
+        return true;
+    }
+
+    function onPreviousPage() {
+        _view.previous();
+        return true;
+    }
+
     function onBack() {
         _view.close();
         return true;
