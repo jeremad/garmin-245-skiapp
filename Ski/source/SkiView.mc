@@ -1,4 +1,5 @@
 import Toybox.Graphics;
+import Toybox.Lang;
 import Toybox.WatchUi;
 
 class SkiView extends WatchUi.View {
@@ -16,16 +17,25 @@ class SkiView extends WatchUi.View {
     function onShow() as Void {
     }
 
+    function formatTime(time as Long) as String {
+        var secs = (time % (1000 * 60)) / 1000;
+        var minutes = (time % (1000 * 3600)) / (1000 * 60);
+        var hours = time / (1000 * 3600);
+		return Lang.format("$1$:$2$:$3$", [hours.format("%02d"), minutes.format("%02d"), secs.format("%02d")]);
+	}
+
+    function formatSpeed(speed as Float) as String {
+        return speed.format("%.1f");
+    }
+
     function onUpdate(dc as Dc) as Void {
         var infos = Activity.getActivityInfo();
-        var time = infos.elapsedTime.toLong();
+        var time = infos.timerTime.toLong();
         dc.clear();
-        var x = dc.getWidth() / 2;
+        var height = dc.getHeight();
+        var width = dc.getWidth();
+        var x = width / 2;
         dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_BLACK);
-        var hours = time / (1000 * 3600);
-        var minutes = (time % (1000 * 3600)) / (1000 * 60);
-        var secs = (time % (1000 * 60)) / 1000;
-        var cents = (time % 1000) / 10;
         var str = null;
         if (_session == null) {
             str = "ready";
@@ -34,14 +44,15 @@ class SkiView extends WatchUi.View {
         } else {
             str = "stopped";
         }
-        dc.drawText(x, 20, Graphics.FONT_TINY, "SKI: " + str, Graphics.TEXT_JUSTIFY_CENTER);
-        if (infos.currentHeartRate != null) {
-            dc.drawText(x, 70, Graphics.FONT_MEDIUM, "HR: " + infos.currentHeartRate , Graphics.TEXT_JUSTIFY_CENTER);
-        }
-        if (infos.currentSpeed != null && infos.currentSpeed != 0) {
-            dc.drawText(x, 120, Graphics.FONT_MEDIUM, "Speed: " + (infos.currentSpeed * 1000 / 3600) + "km/h", Graphics.TEXT_JUSTIFY_CENTER);
-        }
-        dc.drawText(x, 170, Graphics.FONT_MEDIUM, "" + hours + ":" + minutes + ":" + secs + "." + cents, Graphics.TEXT_JUSTIFY_CENTER);
+        var cHR = infos.currentHeartRate == null ? 0 : infos.currentHeartRate;
+        var speed = infos.currentSpeed == null ? 0.0 : infos.currentSpeed * 1000 / 3600;
+        dc.drawText(x, 10, Graphics.FONT_MEDIUM, "SKI: " + str, Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawLine(0, height / 4, width, height / 4);
+        dc.drawText(x, 10 + height / 4, Graphics.FONT_MEDIUM, "HR: " + cHR , Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawLine(0, height / 2, width, height / 2);
+        dc.drawText(x, 10 + height / 2, Graphics.FONT_MEDIUM, "Speed: " + formatSpeed(speed) + " km/h", Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawLine(0, 3 * height / 4, width, 3 * height / 4);
+        dc.drawText(x, 10 + 3 * height / 4, Graphics.FONT_MEDIUM, formatTime(time), Graphics.TEXT_JUSTIFY_CENTER);
     }
 
 
@@ -55,7 +66,7 @@ class SkiView extends WatchUi.View {
                 :sport=>Activity.SPORT_ALPINE_SKIING,
             });
             _timer = new Timer.Timer();
-            _timer.start(method(:ping), 100, true);
+            _timer.start(method(:ping), 50, true);
             _session.start();
         } else if (_session.isRecording()) {
             _session.stop();
