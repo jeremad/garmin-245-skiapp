@@ -4,7 +4,6 @@ import Toybox.WatchUi;
 
 class SkiApp extends Application.AppBase {
 
-    private var _view as SkiView?;
 
     function initialize() {
         AppBase.initialize();
@@ -17,8 +16,9 @@ class SkiApp extends Application.AppBase {
     }
 
     function getInitialView() as [Views] or [Views, InputDelegates] {
-        _view = new $.SkiView();
-        return [ _view, new $.SkiDelegate(_view) ];
+        var ski_view = new $.SkiView();
+        var alternate_view = new $.AlternateSkiView();
+        return [ ski_view, new $.SkiDelegate(ski_view, alternate_view) ];
     }
 
 }
