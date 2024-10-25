@@ -1,6 +1,7 @@
 import Toybox.Lang;
 import Toybox.WatchUi;
 import Toybox.ActivityRecording;
+import Toybox.Position;
 
 
 class SkiDelegate extends WatchUi.BehaviorDelegate {
@@ -15,6 +16,7 @@ class SkiDelegate extends WatchUi.BehaviorDelegate {
         BehaviorDelegate.initialize();
         _ski_view = ski_view;
         _alternate_view = alternate_view;
+        Position.enableLocationEvents(Position.LOCATION_CONTINUOUS, null);
     }
 
     function onSelect() {
@@ -30,7 +32,6 @@ class SkiDelegate extends WatchUi.BehaviorDelegate {
             _session.start();
         }
         _ski_view.setSession(_session);
-        _alternate_view.setSession(_session);
         return true;
     }
 
@@ -39,7 +40,7 @@ class SkiDelegate extends WatchUi.BehaviorDelegate {
             WatchUi.pushView(_alternate_view, self, _transition);
             _current_view++;
         } else if (_current_view == 1) {
-            WatchUi.pushView(_ski_view, self, _transition);
+            WatchUi.popView(_transition);
             _current_view--;
         }
     }
@@ -61,7 +62,6 @@ class SkiDelegate extends WatchUi.BehaviorDelegate {
             }
             _session.save();
             _ski_view.setSession(null);
-            _alternate_view.setSession(null);
             _session = null;
         }
         System.exit();

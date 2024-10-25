@@ -26,8 +26,25 @@ class AlternateSkiView extends BaseView {
         return _distance.format("%.1f") + " km";
     }
 
+    function getGpsQuality() as String {
+        var accuracy = Position.getInfo().accuracy;
+        switch (accuracy) {
+            case Position.QUALITY_NOT_AVAILABLE:
+                return "No GPS";
+            case Position.QUALITY_LAST_KNOWN:
+                return "No GPS";
+            case Position.QUALITY_POOR:
+                return "poor GPS";
+            case Position.QUALITY_USABLE:
+                return "usable GPS";
+            case Position.QUALITY_GOOD:
+                return "good GPS";
+        }
+        return Position.getInfo().accuracy.toString();
+    }
+
     function getField1() as String {
-        return getStatus();
+        return getGpsQuality();
     }
 
     function getField2() as String {
@@ -43,7 +60,6 @@ class AlternateSkiView extends BaseView {
     }
 
     function compute() as Void {
-        computeStatus();
         var infos = Activity.getActivityInfo();
         if (infos.elapsedDistance != null) {
             _distance = infos.elapsedDistance / 1000;

@@ -2,6 +2,7 @@ import Toybox.Graphics;
 import Toybox.Lang;
 import Toybox.WatchUi;
 import Toybox.Activity;
+import Toybox.ActivityRecording;
 
 
 class SkiView extends BaseView {
@@ -9,6 +10,8 @@ class SkiView extends BaseView {
     private var _heat_rate = 0;
     private var _speed = 0f;
     private var _time = 0;
+    private var _status = "ready" as String;
+    private var _session = null as Session?;
 
     function initialize() {
         BaseView.initialize();
@@ -29,6 +32,14 @@ class SkiView extends BaseView {
         return _speed.format("%.1f") + " km/h";
     }
 
+    function getStatus() as String {
+        return _status;
+    }
+
+    function setSession(session as Session?) {
+        _session = session;
+    }
+
     function getField1() as String {
         return getStatus();
     }
@@ -46,13 +57,19 @@ class SkiView extends BaseView {
     }
 
     function compute() as Void {
-        computeStatus();
+        if (_session == null) {
+            _status = "ready";
+        } else if (_session.isRecording()) {
+            _status = "recording";
+        } else {
+            _status = "stopped";
+        }
         var infos = Activity.getActivityInfo();
         if (infos.currentHeartRate != null) {
             _heat_rate = infos.currentHeartRate;
         }
         if (infos.currentSpeed != null) {
-            _speed = infos.currentSpeed;
+            _speed = infos.currentSpeed * 3.6f;
         }
         _time = infos.timerTime.toLong();
         WatchUi.requestUpdate();

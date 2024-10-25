@@ -2,15 +2,12 @@ import Toybox.Graphics;
 import Toybox.Lang;
 import Toybox.WatchUi;
 import Toybox.Activity;
-import Toybox.ActivityRecording;
 import Toybox.Timer;
 
 
 class BaseView extends WatchUi.View {
 
     private var _timer = null as Timer?;
-    private var _status = "ready" as String;
-    private var _session = null as Session?;
 
     function initialize() {
         View.initialize();
@@ -24,24 +21,6 @@ class BaseView extends WatchUi.View {
             _timer = new Timer.Timer();
         }
         _timer.start(method(:compute), 1000, true);
-    }
-
-    function getStatus() as String {
-        return _status;
-    }
-
-    function setSession(session as Session?) {
-        _session = session;
-    }
-
-    function computeStatus() as Void {
-        if (_session == null) {
-            _status = "ready";
-        } else if (_session.isRecording()) {
-            _status = "recording";
-        } else {
-            _status = "stopped";
-        }
     }
 
     function compute() as Void {}
