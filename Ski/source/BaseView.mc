@@ -47,6 +47,10 @@ class BaseView extends WatchUi.View {
 
     function compute(infos as Activity.Info) as Void {}
 
+    function getField1() as String {
+        return getStatus();
+    }
+
     function getField2() as String {
         return "";
     }
@@ -66,11 +70,11 @@ class BaseView extends WatchUi.View {
         dc.clear();
         dc.drawLine(0, height / 4, width, height / 4);
         // The top band is the narrowest part of the round screen, hence the smaller font
-        dc.drawText(width / 2, height / 8, Graphics.FONT_SMALL, getStatus(), JUSTIFY);
+        dc.drawText(width / 2, height / 8, Graphics.FONT_SMALL, getField1(), JUSTIFY);
         drawFields(dc);
     }
 
-    // Draws everything below the status band; fields are centered in their band
+    // Draws everything below the top band; fields are centered in their band
     function drawFields(dc as Dc) as Void {
         var height = dc.getHeight();
         var width = dc.getWidth();

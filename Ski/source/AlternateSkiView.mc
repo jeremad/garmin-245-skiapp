@@ -2,6 +2,7 @@ import Toybox.Graphics;
 import Toybox.Lang;
 import Toybox.WatchUi;
 import Toybox.Activity;
+import Toybox.Position;
 
 
 class AlternateSkiView extends BaseView {
@@ -24,6 +25,26 @@ class AlternateSkiView extends BaseView {
 
     function getFormattedDistance() as String {
         return _distance.format("%.1f") + " km";
+    }
+
+    static function formatGpsQuality(accuracy as Position.Quality) as String {
+        switch (accuracy) {
+            case Position.QUALITY_NOT_AVAILABLE:
+                return "No GPS";
+            case Position.QUALITY_LAST_KNOWN:
+                return "No GPS";
+            case Position.QUALITY_POOR:
+                return "poor GPS";
+            case Position.QUALITY_USABLE:
+                return "usable GPS";
+            case Position.QUALITY_GOOD:
+                return "good GPS";
+        }
+        return accuracy.toString();
+    }
+
+    function getField1() as String {
+        return formatGpsQuality(Position.getInfo().accuracy);
     }
 
     function getField2() as String {

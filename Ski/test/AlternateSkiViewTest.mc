@@ -1,6 +1,18 @@
 import Toybox.Activity;
 import Toybox.Lang;
+import Toybox.Position;
 import Toybox.Test;
+
+
+(:test)
+function alternateSkiViewFormatsGpsQuality(logger as Logger) as Boolean {
+    Test.assertEqual("No GPS", AlternateSkiView.formatGpsQuality(Position.QUALITY_NOT_AVAILABLE));
+    Test.assertEqual("No GPS", AlternateSkiView.formatGpsQuality(Position.QUALITY_LAST_KNOWN));
+    Test.assertEqual("poor GPS", AlternateSkiView.formatGpsQuality(Position.QUALITY_POOR));
+    Test.assertEqual("usable GPS", AlternateSkiView.formatGpsQuality(Position.QUALITY_USABLE));
+    Test.assertEqual("good GPS", AlternateSkiView.formatGpsQuality(Position.QUALITY_GOOD));
+    return true;
+}
 
 
 (:test)
