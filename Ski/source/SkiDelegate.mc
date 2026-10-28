@@ -1,13 +1,11 @@
 import Toybox.Lang;
 import Toybox.WatchUi;
-import Toybox.ActivityRecording;
 
 
 class SkiDelegate extends WatchUi.BehaviorDelegate {
 
     private var _ski_view as SkiView;
     private var _alternate_view as AlternateSkiView;
-    private var _session = null as Session?;
     private var _current_view = 0;
     private const _transition = WatchUi.SLIDE_IMMEDIATE;
 
@@ -18,29 +16,18 @@ class SkiDelegate extends WatchUi.BehaviorDelegate {
     }
 
     function onSelect() {
-        if (_session == null) {
-            _session = ActivityRecording.createSession({
-                :name=>"Ski",
-                :sport=>Activity.SPORT_ALPINE_SKIING,
-            });
-            _session.start();
-        } else if (_session.isRecording()) {
-            _session.stop();
-        } else {
-            _session.start();
-        }
-        _ski_view.setSession(_session);
-        _alternate_view.setSession(_session);
+        getApp().toggleSession();
+        WatchUi.requestUpdate();
         return true;
     }
 
     function switchPage() as Void {
         if (_current_view == 0) {
-            WatchUi.pushView(_alternate_view, self, _transition);
-            _current_view++;
-        } else if (_current_view == 1) {
-            WatchUi.pushView(_ski_view, self, _transition);
-            _current_view--;
+            WatchUi.switchToView(_alternate_view, self, _transition);
+            _current_view = 1;
+        } else {
+            WatchUi.switchToView(_ski_view, self, _transition);
+            _current_view = 0;
         }
     }
 
@@ -55,15 +42,11 @@ class SkiDelegate extends WatchUi.BehaviorDelegate {
     }
 
     function onBack() {
-        if (_session != null) {
-            if (_session.isRecording()) {
-                _session.stop();
-            }
-            _session.save();
-            _ski_view.setSession(null);
-            _alternate_view.setSession(null);
-            _session = null;
+        if (getApp().getSession() == null) {
+            // Nothing to save: let the default behavior pop the only view and exit
+            return false;
         }
-        System.exit();
+        WatchUi.pushView(new WatchUi.Confirmation("Save and exit?"), new $.ExitConfirmationDelegate(), _transition);
+        return true;
     }
 }

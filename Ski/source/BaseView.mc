@@ -8,9 +8,7 @@ import Toybox.Timer;
 
 class BaseView extends WatchUi.View {
 
-    private var _timer = null as Timer?;
-    private var _status = "ready" as String;
-    private var _session = null as Session?;
+    private var _timer = null as Timer.Timer?;
 
     function initialize() {
         View.initialize();
@@ -23,31 +21,32 @@ class BaseView extends WatchUi.View {
         if (_timer == null) {
             _timer = new Timer.Timer();
         }
-        _timer.start(method(:compute), 1000, true);
+        _timer.start(method(:refresh), 1000, true);
+        refresh();
+    }
+
+    function refresh() as Void {
+        var infos = Activity.getActivityInfo();
+        if (infos != null) {
+            compute(infos);
+        }
+        WatchUi.requestUpdate();
     }
 
     function getStatus() as String {
-        return _status;
-    }
-
-    function setSession(session as Session?) {
-        _session = session;
-    }
-
-    function computeStatus() as Void {
-        if (_session == null) {
-            _status = "ready";
-        } else if (_session.isRecording()) {
-            _status = "recording";
-        } else {
-            _status = "stopped";
+        var session = getApp().getSession();
+        if (session == null) {
+            return "ready";
+        } else if (session.isRecording()) {
+            return "recording";
         }
+        return "stopped";
     }
 
-    function compute() as Void {}
+    function compute(infos as Activity.Info) as Void {}
 
     function getField1() as String {
-        return "";
+        return getStatus();
     }
 
     function getField2() as String {
@@ -71,10 +70,12 @@ class BaseView extends WatchUi.View {
         dc.drawLine(0, height / 2, width, height / 2);
         dc.drawLine(0, 3 * height / 4, width, 3 * height / 4);
         var x = width / 2;
-        dc.drawText(x, 10, Graphics.FONT_MEDIUM, getField1(), Graphics.TEXT_JUSTIFY_CENTER);
-        dc.drawText(x, 10 + height / 4, Graphics.FONT_MEDIUM, getField2() , Graphics.TEXT_JUSTIFY_CENTER);
-        dc.drawText(x, 10 + height / 2, Graphics.FONT_MEDIUM, getField3(), Graphics.TEXT_JUSTIFY_CENTER);
-        dc.drawText(x, 10 + 3 * height / 4, Graphics.FONT_MEDIUM, getField4(), Graphics.TEXT_JUSTIFY_CENTER);
+        var justify = Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER;
+        // Fields are centered in their band; the top band is the narrowest part of the round screen, hence the smaller font
+        dc.drawText(x, height / 8, Graphics.FONT_SMALL, getField1(), justify);
+        dc.drawText(x, 3 * height / 8, Graphics.FONT_MEDIUM, getField2(), justify);
+        dc.drawText(x, 5 * height / 8, Graphics.FONT_MEDIUM, getField3(), justify);
+        dc.drawText(x, 7 * height / 8, Graphics.FONT_MEDIUM, getField4(), justify);
     }
 
     function onHide() as Void {
