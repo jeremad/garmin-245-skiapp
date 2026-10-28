@@ -58,9 +58,8 @@ class SkiApp extends Application.AppBase {
     }
 
     function getInitialView() as [Views] or [Views, InputDelegates] {
-        var ski_view = new $.SkiView();
-        var alternate_view = new $.AlternateSkiView();
-        return [ ski_view, new $.SkiDelegate(ski_view, alternate_view) ];
+        var views = [ new $.SkiView(), new $.AlternateSkiView(), new $.TimeOfDayView() ] as Array<BaseView>;
+        return [ views[0], new $.SkiDelegate(views) ];
     }
 
 }

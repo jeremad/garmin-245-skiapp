@@ -4,15 +4,18 @@ import Toybox.WatchUi;
 
 class SkiDelegate extends WatchUi.BehaviorDelegate {
 
-    private var _ski_view as SkiView;
-    private var _alternate_view as AlternateSkiView;
+    private var _views as Array<BaseView>;
     private var _current_view = 0;
     private const _transition = WatchUi.SLIDE_IMMEDIATE;
 
-    function initialize(ski_view as SkiView, alternate_view as AlternateSkiView) {
+    function initialize(views as Array<BaseView>) {
         BehaviorDelegate.initialize();
-        _ski_view = ski_view;
-        _alternate_view = alternate_view;
+        _views = views;
+    }
+
+    // Index of the page `step` pages away from `index`, wrapping around at both ends
+    static function pageIndex(index as Number, step as Number, count as Number) as Number {
+        return ((index + step) % count + count) % count;
     }
 
     function onSelect() {
@@ -21,23 +24,18 @@ class SkiDelegate extends WatchUi.BehaviorDelegate {
         return true;
     }
 
-    function switchPage() as Void {
-        if (_current_view == 0) {
-            WatchUi.switchToView(_alternate_view, self, _transition);
-            _current_view = 1;
-        } else {
-            WatchUi.switchToView(_ski_view, self, _transition);
-            _current_view = 0;
-        }
+    function switchPage(step as Number) as Void {
+        _current_view = pageIndex(_current_view, step, _views.size());
+        WatchUi.switchToView(_views[_current_view], self, _transition);
     }
 
     function onNextPage() {
-        switchPage();
+        switchPage(1);
         return true;
     }
 
     function onPreviousPage() {
-        switchPage();
+        switchPage(-1);
         return true;
     }
 

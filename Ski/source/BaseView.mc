@@ -8,6 +8,8 @@ import Toybox.Timer;
 
 class BaseView extends WatchUi.View {
 
+    protected const JUSTIFY = Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER;
+
     private var _timer = null as Timer.Timer?;
 
     function initialize() {
@@ -45,10 +47,6 @@ class BaseView extends WatchUi.View {
 
     function compute(infos as Activity.Info) as Void {}
 
-    function getField1() as String {
-        return getStatus();
-    }
-
     function getField2() as String {
         return "";
     }
@@ -67,15 +65,21 @@ class BaseView extends WatchUi.View {
         dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_BLACK);
         dc.clear();
         dc.drawLine(0, height / 4, width, height / 4);
+        // The top band is the narrowest part of the round screen, hence the smaller font
+        dc.drawText(width / 2, height / 8, Graphics.FONT_SMALL, getStatus(), JUSTIFY);
+        drawFields(dc);
+    }
+
+    // Draws everything below the status band; fields are centered in their band
+    function drawFields(dc as Dc) as Void {
+        var height = dc.getHeight();
+        var width = dc.getWidth();
         dc.drawLine(0, height / 2, width, height / 2);
         dc.drawLine(0, 3 * height / 4, width, 3 * height / 4);
         var x = width / 2;
-        var justify = Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER;
-        // Fields are centered in their band; the top band is the narrowest part of the round screen, hence the smaller font
-        dc.drawText(x, height / 8, Graphics.FONT_SMALL, getField1(), justify);
-        dc.drawText(x, 3 * height / 8, Graphics.FONT_MEDIUM, getField2(), justify);
-        dc.drawText(x, 5 * height / 8, Graphics.FONT_MEDIUM, getField3(), justify);
-        dc.drawText(x, 7 * height / 8, Graphics.FONT_MEDIUM, getField4(), justify);
+        dc.drawText(x, 3 * height / 8, Graphics.FONT_MEDIUM, getField2(), JUSTIFY);
+        dc.drawText(x, 5 * height / 8, Graphics.FONT_MEDIUM, getField3(), JUSTIFY);
+        dc.drawText(x, 7 * height / 8, Graphics.FONT_MEDIUM, getField4(), JUSTIFY);
     }
 
     function onHide() as Void {
