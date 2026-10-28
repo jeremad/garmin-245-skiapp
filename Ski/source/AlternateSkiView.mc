@@ -2,6 +2,7 @@ import Toybox.Graphics;
 import Toybox.Lang;
 import Toybox.WatchUi;
 import Toybox.Activity;
+import Toybox.Position;
 
 
 class AlternateSkiView extends BaseView {
@@ -26,8 +27,24 @@ class AlternateSkiView extends BaseView {
         return _distance.format("%.1f") + " km";
     }
 
+    static function formatGpsQuality(accuracy as Position.Quality) as String {
+        switch (accuracy) {
+            case Position.QUALITY_NOT_AVAILABLE:
+                return "No GPS";
+            case Position.QUALITY_LAST_KNOWN:
+                return "No GPS";
+            case Position.QUALITY_POOR:
+                return "poor GPS";
+            case Position.QUALITY_USABLE:
+                return "usable GPS";
+            case Position.QUALITY_GOOD:
+                return "good GPS";
+        }
+        return accuracy.toString();
+    }
+
     function getField1() as String {
-        return getStatus();
+        return formatGpsQuality(Position.getInfo().accuracy);
     }
 
     function getField2() as String {
@@ -42,18 +59,9 @@ class AlternateSkiView extends BaseView {
         return getFormattedDescent();
     }
 
-    function compute() as Void {
-        computeStatus();
-        var infos = Activity.getActivityInfo();
-        if (infos.elapsedDistance != null) {
-            _distance = infos.elapsedDistance / 1000;
-        }
-        if (infos.totalAscent != null) {
-            _distance = infos.totalAscent.toNumber();
-        }
-        if (infos.totalDescent != null) {
-            _distance = infos.totalDescent.toNumber();
-        }
-        WatchUi.requestUpdate();
+    function compute(infos as Activity.Info) as Void {
+        _distance = infos.elapsedDistance == null ? 0f : infos.elapsedDistance / 1000;
+        _ascent = infos.totalAscent == null ? 0 : infos.totalAscent.toNumber();
+        _descent = infos.totalDescent == null ? 0 : infos.totalDescent.toNumber();
     }
 }

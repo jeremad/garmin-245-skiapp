@@ -6,7 +6,7 @@ import Toybox.Activity;
 
 class SkiView extends BaseView {
 
-    private var _heat_rate = 0;
+    private var _heart_rate = 0;
     private var _speed = 0f;
     private var _time = 0;
 
@@ -22,15 +22,11 @@ class SkiView extends BaseView {
 	}
 
     function getFormattedHR() as String {
-        return _heat_rate + " bpm";
+        return _heart_rate + " bpm";
     }
 
     function getFormattedSpeed() as String {
         return _speed.format("%.1f") + " km/h";
-    }
-
-    function getField1() as String {
-        return getStatus();
     }
 
     function getField2() as String {
@@ -45,16 +41,10 @@ class SkiView extends BaseView {
         return getFormattedTime();
     }
 
-    function compute() as Void {
-        computeStatus();
-        var infos = Activity.getActivityInfo();
-        if (infos.currentHeartRate != null) {
-            _heat_rate = infos.currentHeartRate;
-        }
-        if (infos.currentSpeed != null) {
-            _speed = infos.currentSpeed;
-        }
-        _time = infos.timerTime.toLong();
-        WatchUi.requestUpdate();
+    function compute(infos as Activity.Info) as Void {
+        _heart_rate = infos.currentHeartRate == null ? 0 : infos.currentHeartRate;
+        // currentSpeed is in m/s
+        _speed = infos.currentSpeed == null ? 0f : infos.currentSpeed * 3.6;
+        _time = infos.timerTime == null ? 0 : infos.timerTime;
     }
 }

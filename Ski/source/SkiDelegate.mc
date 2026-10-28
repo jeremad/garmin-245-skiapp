@@ -1,69 +1,50 @@
 import Toybox.Lang;
 import Toybox.WatchUi;
-import Toybox.ActivityRecording;
 
 
 class SkiDelegate extends WatchUi.BehaviorDelegate {
 
-    private var _ski_view as SkiView;
-    private var _alternate_view as AlternateSkiView;
-    private var _session = null as Session?;
+    private var _views as Array<BaseView>;
     private var _current_view = 0;
     private const _transition = WatchUi.SLIDE_IMMEDIATE;
 
-    function initialize(ski_view as SkiView, alternate_view as AlternateSkiView) {
+    function initialize(views as Array<BaseView>) {
         BehaviorDelegate.initialize();
-        _ski_view = ski_view;
-        _alternate_view = alternate_view;
+        _views = views;
+    }
+
+    // Index of the page `step` pages away from `index`, wrapping around at both ends
+    static function pageIndex(index as Number, step as Number, count as Number) as Number {
+        return ((index + step) % count + count) % count;
     }
 
     function onSelect() {
-        if (_session == null) {
-            _session = ActivityRecording.createSession({
-                :name=>"Ski",
-                :sport=>Activity.SPORT_ALPINE_SKIING,
-            });
-            _session.start();
-        } else if (_session.isRecording()) {
-            _session.stop();
-        } else {
-            _session.start();
-        }
-        _ski_view.setSession(_session);
-        _alternate_view.setSession(_session);
+        getApp().toggleSession();
+        WatchUi.requestUpdate();
         return true;
     }
 
-    function switchPage() as Void {
-        if (_current_view == 0) {
-            WatchUi.pushView(_alternate_view, self, _transition);
-            _current_view++;
-        } else if (_current_view == 1) {
-            WatchUi.pushView(_ski_view, self, _transition);
-            _current_view--;
-        }
+    function switchPage(step as Number) as Void {
+        _current_view = pageIndex(_current_view, step, _views.size());
+        WatchUi.switchToView(_views[_current_view], self, _transition);
     }
 
     function onNextPage() {
-        switchPage();
+        switchPage(1);
         return true;
     }
 
     function onPreviousPage() {
-        switchPage();
+        switchPage(-1);
         return true;
     }
 
     function onBack() {
-        if (_session != null) {
-            if (_session.isRecording()) {
-                _session.stop();
-            }
-            _session.save();
-            _ski_view.setSession(null);
-            _alternate_view.setSession(null);
-            _session = null;
+        if (getApp().getSession() == null) {
+            // Nothing to save: let the default behavior pop the only view and exit
+            return false;
         }
-        System.exit();
+        WatchUi.pushView(new WatchUi.Confirmation("Save and exit?"), new $.ExitConfirmationDelegate(), _transition);
+        return true;
     }
 }
