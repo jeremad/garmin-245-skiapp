@@ -57,6 +57,16 @@ class SkiApp extends Application.AppBase {
         }
     }
 
+    function discardSession() as Void {
+        if (_session != null) {
+            if (_session.isRecording()) {
+                _session.stop();
+            }
+            _session.discard();
+            _session = null;
+        }
+    }
+
     function getInitialView() as [Views] or [Views, InputDelegates] {
         var views = [ new $.SkiView(), new $.AlternateSkiView(), new $.TimeOfDayView() ] as Array<BaseView>;
         return [ views[0], new $.SkiDelegate(views) ];

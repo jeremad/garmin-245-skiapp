@@ -3,7 +3,7 @@ import Toybox.System;
 import Toybox.WatchUi;
 
 
-class ExitConfirmationDelegate extends WatchUi.ConfirmationDelegate {
+class DiscardConfirmationDelegate extends WatchUi.ConfirmationDelegate {
 
     function initialize() {
         ConfirmationDelegate.initialize();
@@ -11,7 +11,7 @@ class ExitConfirmationDelegate extends WatchUi.ConfirmationDelegate {
 
     function onResponse(response as Confirm) as Boolean {
         if (response == WatchUi.CONFIRM_YES) {
-            getApp().saveSession();
+            getApp().discardSession();
             System.exit();
         }
         return true;
