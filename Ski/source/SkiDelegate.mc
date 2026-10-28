@@ -44,7 +44,7 @@ class SkiDelegate extends WatchUi.BehaviorDelegate {
             // Nothing to save: let the default behavior pop the only view and exit
             return false;
         }
-        WatchUi.pushView(new WatchUi.Confirmation("Save and exit?"), new $.ExitConfirmationDelegate(), _transition);
+        WatchUi.pushView(ExitMenuDelegate.createMenu(), new $.ExitMenuDelegate(), _transition);
         return true;
     }
 }
